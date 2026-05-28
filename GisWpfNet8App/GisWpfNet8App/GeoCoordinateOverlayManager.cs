@@ -1,54 +1,44 @@
-using System.Collections.Generic;
-using GisWinFormsNet8App.Models;
-using GisWinFormsNet8App.Utils;
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
+using GisWinFormsNet8App.Models;
+using GisWinFormsNet8App.Utils;
 
 namespace GisWinFormsNet8App
 {
     public class GeoCoordinateOverlayManager
     {
-        private readonly GMapControl _mapControl;
-        private readonly List<GMapOverlay> _overlays = new List<GMapOverlay>();
+        private readonly GMapControl _map;
+        private readonly GMapOverlay _overlay;
+        private readonly Dictionary<GeoCoordinate, GMapMarker> _markers = new();
 
-        public GeoCoordinateOverlayManager(GMapControl mapControl)
+        public GeoCoordinateOverlayManager(GMapControl map)
         {
-            _mapControl = mapControl;
+            _map = map;
+            _overlay = new GMapOverlay("GeoCoordinateLayer");
+            _map.Overlays.Add(_overlay);
         }
 
-        public void LoadPoints(List<GeoCoordinate> points)
+        public void Register(GeoCoordinate coord)
         {
-            foreach (var overlay in _overlays)
-                _mapControl.Overlays.Remove(overlay);
-            _overlays.Clear();
-
-            for (int i = 0; i < points.Count; i++)
+            var (lat, lon) = Twd97Converter.ToWgs84(coord.EastX, coord.NorthY);
+            var marker = new GMarkerGoogle(new PointLatLng(lat, lon), GMarkerGoogleType.blue)
             {
-                var pt = points[i];
-                var (lat, lon) = Twd97Converter.ToWgs84(pt.EastX, pt.NorthY);
-
-                var overlay = new GMapOverlay($"GeoPoint_{pt.CoordinateId}");
-                var marker = new GMarkerGoogle(new PointLatLng(lat, lon), GMarkerGoogleType.blue)
-                {
-                    ToolTipText = $"{pt.Name}\n高程: {pt.BaseElevation} m",
-                    ToolTipMode = MarkerTooltipMode.OnMouseOver
-                };
-
-                overlay.Markers.Add(marker);
-                overlay.IsVisibile = false;
-                _mapControl.Overlays.Add(overlay);
-                _overlays.Add(overlay);
-            }
-
-            _mapControl.Refresh();
+                ToolTipText = $"{coord.Name}\n高程: {coord.BaseElevation} m",
+                ToolTipMode = MarkerTooltipMode.OnMouseOver,
+                IsVisible = false
+            };
+            _overlay.Markers.Add(marker);
+            _markers[coord] = marker;
         }
 
-        public void SetPointVisibility(int index, bool show)
+        public void SetVisible(GeoCoordinate coord, bool visible)
         {
-            if (index < 0 || index >= _overlays.Count) return;
-            _overlays[index].IsVisibile = show;
-            _mapControl.Refresh();
+            if (_markers.TryGetValue(coord, out var marker))
+            {
+                marker.IsVisible = visible;
+                _map.Refresh();
+            }
         }
     }
 }

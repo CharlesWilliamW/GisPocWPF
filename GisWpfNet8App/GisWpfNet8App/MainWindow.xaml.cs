@@ -6,6 +6,7 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GisWinFormsNet8App;
+using GisWinFormsNet8App.Models;
 using GisWinFormsNet8App.Services;
 
 namespace GisWpfApp
@@ -21,6 +22,8 @@ namespace GisWpfApp
 
         // GMap WinForms 控件，透過 WindowsFormsHost 嵌入
         private readonly GMapControl gMapControl1;
+
+        private List<GeoCoordinate> _geoData = new();
 
         // 追蹤災害圖層 Toggle 狀態
         private bool _isDisasterShown = false;
@@ -156,22 +159,23 @@ namespace GisWpfApp
         // ──────────────────────────────────────────────────────
         private async Task LoadGeoPointsAsync()
         {
-            var data = await _geoService.GetCoordinatesAsync();
-            _geoManager.LoadPoints(data);
+            _geoData = await _geoService.GetCoordinatesAsync();
+            foreach (var coord in _geoData)
+                _geoManager.Register(coord);
 
-            if (data.Count > 0) chkGeoA.Content = data[0].Name;
-            if (data.Count > 1) chkGeoB.Content = data[1].Name;
-            if (data.Count > 2) chkGeoC.Content = data[2].Name;
+            if (_geoData.Count > 0) chkGeoA.Content = _geoData[0].Name;
+            if (_geoData.Count > 1) chkGeoB.Content = _geoData[1].Name;
+            if (_geoData.Count > 2) chkGeoC.Content = _geoData[2].Name;
         }
 
         private void chkGeo_Changed(object sender, RoutedEventArgs e)
         {
-            if (sender == chkGeoA)
-                _geoManager.SetPointVisibility(0, chkGeoA.IsChecked == true);
-            else if (sender == chkGeoB)
-                _geoManager.SetPointVisibility(1, chkGeoB.IsChecked == true);
-            else if (sender == chkGeoC)
-                _geoManager.SetPointVisibility(2, chkGeoC.IsChecked == true);
+            if (sender == chkGeoA && _geoData.Count > 0)
+                _geoManager.SetVisible(_geoData[0], chkGeoA.IsChecked == true);
+            else if (sender == chkGeoB && _geoData.Count > 1)
+                _geoManager.SetVisible(_geoData[1], chkGeoB.IsChecked == true);
+            else if (sender == chkGeoC && _geoData.Count > 2)
+                _geoManager.SetVisible(_geoData[2], chkGeoC.IsChecked == true);
         }
 
         // ──────────────────────────────────────────────────────
