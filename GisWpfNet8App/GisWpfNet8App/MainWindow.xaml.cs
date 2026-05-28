@@ -203,6 +203,30 @@ namespace GisWpfApp
         }
 
         // ──────────────────────────────────────────────────────
+        // 比對設施按鈕：需勾選恰好兩個設施
+        // ──────────────────────────────────────────────────────
+        private void btnCompare_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = new List<GeoCoordinate>();
+            if (chkGeoA.IsChecked == true && _geoData.Count > 0) selected.Add(_geoData[0]);
+            if (chkGeoB.IsChecked == true && _geoData.Count > 1) selected.Add(_geoData[1]);
+            if (chkGeoC.IsChecked == true && _geoData.Count > 2) selected.Add(_geoData[2]);
+
+            if (selected.Count != 2)
+            {
+                System.Windows.MessageBox.Show(
+                    "請勾選兩個設施進行比對",
+                    "提示",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+
+            var dlg = new CompareWindow(selected[0], selected[1]) { Owner = this };
+            dlg.ShowDialog();
+        }
+
+        // ──────────────────────────────────────────────────────
         // 工具方法：解析半徑輸入欄位，預設 500m
         // ──────────────────────────────────────────────────────
         private double TryParseRadius()
