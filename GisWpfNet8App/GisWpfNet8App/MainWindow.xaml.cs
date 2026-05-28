@@ -158,6 +158,10 @@ namespace GisWpfApp
         {
             var data = await _geoService.GetCoordinatesAsync();
             _geoManager.LoadPoints(data);
+
+            if (data.Count > 0) chkGeoA.Content = data[0].Name;
+            if (data.Count > 1) chkGeoB.Content = data[1].Name;
+            if (data.Count > 2) chkGeoC.Content = data[2].Name;
         }
 
         private void chkGeo_Changed(object sender, RoutedEventArgs e)
