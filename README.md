@@ -1,61 +1,92 @@
 # GisPocWPF
 
 A GIS (Geographic Information System) proof-of-concept desktop application built with WPF and C#.
-This project demonstrates map rendering, layer management, spatial visualization, and GIS-related desktop workflow integration using .NET technologies.
+This project demonstrates map rendering, spatial analysis, layer visualization, and GIS-related desktop workflow integration using .NET technologies.
 
-## Features
+---
+
+# Features
 
 * Interactive GIS map viewer
-* Tile-based map rendering
-* Layer loading and visualization
+* Facility comparison visualization
+* Buffer analysis
+* Distance / measurement tools
+* Disaster warning pin visualization
 * Coordinate display and map interaction
 * Zoom and pan support
 * WPF desktop UI implementation
 * Modular GIS experimentation architecture
 
-## Tech Stack
+---
+
+# Tech Stack
 
 * C#
 * .NET
 * WPF (Windows Presentation Foundation)
 * XAML
-* GIS / Map Tile Rendering
+* GIS / Spatial Visualization
 
-## Project Structure
+---
+
+# Screenshots
+
+## Disaster Warning Pins
+
+<img src="./docs/images/disaster-warning-pins.png" width="1000"/>
+
+Visualization of disaster warning locations and map-based spatial alerts.
+
+---
+
+## Measurement Tool
+
+<img src="./docs/images/measurement.png" width="1000"/>
+
+Interactive GIS distance measurement functionality.
+
+---
+
+## Facility Compare
+
+<img src="./docs/images/facility-compare.png" width="1000"/>
+
+Spatial comparison and visualization between multiple facilities.
+
+---
+
+## Buffer Analysis
+
+<img src="./docs/images/buffer.png" width="1000"/>
+
+Buffer area generation and spatial range analysis.
+
+---
+
+# Project Structure
 
 ```text
 GisPocWPF/
+├── docs/
+│   └── images/
 ├── Models/
 ├── Services/
 ├── ViewModels/
 ├── Views/
-├── Resources/
 └── App.xaml
 ```
 
-## Screenshots
+---
 
-### Main Window
+# Getting Started
 
-```md
-![Main Window](./Screenshots/main-window.png)
-```
-
-### Map Interaction
-
-```md
-![Map Interaction](./Screenshots/map-interaction.png)
-```
-
-## Getting Started
-
-### Requirements
+## Requirements
 
 * Visual Studio 2022 or later
 * .NET SDK
 * Windows OS
 
-### Build & Run
+## Build & Run
 
 ```bash
 git clone https://github.com/CharlesWilliamW/GisPocWPF.git
@@ -63,21 +94,28 @@ git clone https://github.com/CharlesWilliamW/GisPocWPF.git
 
 Open the solution in Visual Studio and run the project.
 
-## Purpose
+---
+
+# Purpose
 
 This repository was created as a GIS desktop application proof-of-concept for experimenting with:
 
 * GIS visualization workflows
 * Desktop spatial interaction
 * WPF-based map UI architecture
+* Spatial analysis visualization
 * Modular GIS application design
 
-## Future Improvements
+---
+
+# Future Improvements
 
 * Real-time government API integration
 * Layer grouping & filtering
 * Offline tile caching
 
-## License
+---
+
+# License
 
 MIT License
