@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- WPF 必要 -->
+    <UseWPF>true</UseWPF>
+
+    <!-- 啟用 WindowsFormsHost 以嵌入 GMapControl -->
+    <UseWindowsForms>true</UseWindowsForms>
+
+    <!-- 啟動視窗 -->
+    <StartupObject>GisWpfApp.App</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- GMap.NET WinForms (地圖引擎，透過 WindowsFormsHost 嵌入) -->
+    <PackageReference Include="GMap.NET.WinForms" Version="2.1.7" />
+
+    <!-- JSON 序列化 (MapDataService 使用) -->
+    <PackageReference Include="System.Text.Json" Version="10.0.8" />
+  </ItemGroup>
+
+</Project>

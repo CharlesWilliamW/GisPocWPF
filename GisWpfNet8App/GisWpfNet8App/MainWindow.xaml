@@ -1,0 +1,485 @@
+<Window x:Class="GisWpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wfh="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        mc:Ignorable="d"
+        Title="地理圖資分析系統 — GIS Platform"
+        Height="720" Width="1200"
+        MinHeight="560" MinWidth="900"
+        Background="#0D1117"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+
+        <!-- ══════════════════════════════════════════
+             色彩語彙 (Color Tokens)
+        ══════════════════════════════════════════ -->
+        <SolidColorBrush x:Key="BgBase"        Color="#0D1117"/>
+        <SolidColorBrush x:Key="BgPanel"       Color="#161B22"/>
+        <SolidColorBrush x:Key="BgCard"        Color="#1C2128"/>
+        <SolidColorBrush x:Key="BorderSubtle"  Color="#30363D"/>
+        <SolidColorBrush x:Key="BorderAccent"  Color="#1F6FEB"/>
+        <SolidColorBrush x:Key="AccentBlue"    Color="#1F6FEB"/>
+        <SolidColorBrush x:Key="AccentGreen"   Color="#3FB950"/>
+        <SolidColorBrush x:Key="AccentOrange"  Color="#F78166"/>
+        <SolidColorBrush x:Key="AccentYellow"  Color="#D29922"/>
+        <SolidColorBrush x:Key="TextPrimary"   Color="#E6EDF3"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#7D8590"/>
+        <SolidColorBrush x:Key="TextMuted"     Color="#484F58"/>
+
+        <!-- ══════════════════════════════════════════
+             共用 ControlTemplate：圓角卡片區塊
+        ══════════════════════════════════════════ -->
+        <Style x:Key="CardBorder" TargetType="Border">
+            <Setter Property="Background"       Value="{StaticResource BgCard}"/>
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="CornerRadius"     Value="8"/>
+            <Setter Property="Padding"          Value="14,10"/>
+        </Style>
+
+        <!-- 區段標題文字 -->
+        <Style x:Key="SectionLabel" TargetType="TextBlock">
+            <Setter Property="FontSize"     Value="10"/>
+            <Setter Property="FontWeight"   Value="SemiBold"/>
+            <Setter Property="Foreground"   Value="{StaticResource TextMuted}"/>
+            <Setter Property="Margin"       Value="0,0,0,8"/>
+        </Style>
+
+        <!-- 主要功能按鈕：Toggle 外觀 -->
+        <Style x:Key="PrimaryToggleButton" TargetType="ToggleButton">
+            <Setter Property="Height"           Value="34"/>
+            <Setter Property="Cursor"           Value="Hand"/>
+            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="FontWeight"       Value="Medium"/>
+            <Setter Property="Foreground"       Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Background"       Value="{StaticResource BgCard}"/>
+            <Setter Property="BorderBrush"      Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding"          Value="10,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Height="{TemplateBinding Height}"
+                                Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="Dot" Width="7" Height="7" Margin="0,0,8,0" Fill="#484F58"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Root"     Property="Background"   Value="#162032"/>
+                                <Setter TargetName="Root"     Property="BorderBrush"  Value="{StaticResource AccentBlue}"/>
+                                <Setter TargetName="Dot"      Property="Fill"         Value="#1F6FEB"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1C2128"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- CheckBox 樣式 -->
+        <Style x:Key="GisCheckBox" TargetType="CheckBox">
+            <Setter Property="Foreground"  Value="{StaticResource TextSecondary}"/>
+            <Setter Property="FontSize"    Value="12"/>
+            <Setter Property="Cursor"      Value="Hand"/>
+            <Setter Property="Margin"      Value="0,4,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="Box"
+                                    Width="16" Height="16"
+                                    CornerRadius="4"
+                                    BorderThickness="1.5"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    Background="Transparent"
+                                    Margin="0,0,8,0">
+                                <Path x:Name="Check"
+                                      Data="M3,8 L6,11 L13,4"
+                                      Stroke="#1F6FEB"
+                                      StrokeThickness="1.8"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Visibility="Collapsed"/>
+                            </Border>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Box"   Property="BorderBrush"  Value="{StaticResource AccentBlue}"/>
+                                <Setter TargetName="Box"   Property="Background"   Value="#162032"/>
+                                <Setter TargetName="Check" Property="Visibility"   Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource AccentBlue}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 次要操作按鈕 -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Height"          Value="30"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor"          Value="Hand"/>
+            <Setter Property="Padding"         Value="10,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Height="{TemplateBinding Height}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background"   Value="#1C2128"/>
+                                <Setter TargetName="Root" Property="BorderBrush"  Value="{StaticResource TextMuted}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#0D1117"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 危險動作按鈕 (清除) -->
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Foreground" Value="{StaticResource AccentOrange}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="Transparent"
+                                BorderBrush="{StaticResource BorderSubtle}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Height="{TemplateBinding Height}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background"  Value="#1A0F0D"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentOrange}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 狀態指示燈 (紅/黃/綠) -->
+        <Style x:Key="StatusDot" TargetType="Ellipse">
+            <Setter Property="Width"  Value="8"/>
+            <Setter Property="Height" Value="8"/>
+        </Style>
+
+    </Window.Resources>
+
+    <!-- ══════════════════════════════════════════════════════════
+         根佈局：左側面板 (260px) + 右側地圖區
+    ══════════════════════════════════════════════════════════ -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ────────────────────────────────────────
+             左側控制面板
+        ──────────────────────────────────────── -->
+        <Border Grid.Column="0"
+                Background="{StaticResource BgPanel}"
+                BorderBrush="{StaticResource BorderSubtle}"
+                BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>  <!-- 標題列 -->
+                    <RowDefinition Height="*"/>     <!-- 控制區 -->
+                    <RowDefinition Height="Auto"/>  <!-- 狀態列 -->
+                </Grid.RowDefinitions>
+
+                <!-- ── 標題 ── -->
+                <Border Grid.Row="0"
+                        Padding="18,16,18,14"
+                        BorderBrush="{StaticResource BorderSubtle}"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- 簡易 LOGO 圖示 -->
+                            <Viewbox Width="20" Height="20" Margin="0,0,8,0">
+                                <Canvas Width="24" Height="24">
+                                    <Ellipse Canvas.Left="2" Canvas.Top="2"
+                                             Width="20" Height="20"
+                                             Stroke="#1F6FEB" StrokeThickness="2"/>
+                                    <Line X1="12" Y1="2"  X2="12" Y2="22"
+                                          Stroke="#1F6FEB" StrokeThickness="1.5"/>
+                                    <Line X1="2"  Y1="12" X2="22" Y2="12"
+                                          Stroke="#1F6FEB" StrokeThickness="1.5"/>
+                                    <Ellipse Canvas.Left="5" Canvas.Top="5"
+                                             Width="14" Height="14"
+                                             Stroke="#3FB950" StrokeThickness="1"
+                                             StrokeDashArray="2,2"/>
+                                </Canvas>
+                            </Viewbox>
+                            <StackPanel>
+                                <TextBlock Text="GIS Platform"
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <TextBlock Text="地理圖資分析系統"
+                                           FontSize="10"
+                                           Foreground="{StaticResource TextMuted}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ── 主控制捲動區 ── -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="14,14,14,14">
+                    <StackPanel>
+
+                        <!-- ◆ 圖層管理 Section ◆ -->
+                        <TextBlock Text="圖 層 管 理" Style="{StaticResource SectionLabel}"/>
+
+                        <!-- 災害觀測點 Toggle -->
+                        <ToggleButton x:Name="btnToggleDisaster"
+                                      Style="{StaticResource PrimaryToggleButton}"
+                                      Content="顯示災害觀測點"
+                                      Checked="btnToggleDisaster_Checked"
+                                      Unchecked="btnToggleDisaster_Unchecked"
+                                      Margin="0,0,0,6"/>
+
+                        <!-- ◆ 距離量測 Section ◆ -->
+                        <TextBlock Text="距 離 量 測" Style="{StaticResource SectionLabel}"
+                                   Margin="0,16,0,8"/>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <CheckBox x:Name="chkMeasureMode"
+                                          Style="{StaticResource GisCheckBox}"
+                                          Content="開啟測距模式 (點擊兩點)"
+                                          Margin="0,0,0,8"/>
+                                <Button x:Name="btnClearMeasure"
+                                        Style="{StaticResource DangerButton}"
+                                        Content="✕  清除量測結果"
+                                        Click="btnClearMeasure_Click"
+                                        HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ◆ 緩衝區分析 Section ◆ -->
+                        <TextBlock Text="緩 衝 區 分 析" Style="{StaticResource SectionLabel}"
+                                   Margin="0,16,0,8"/>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <CheckBox x:Name="chkBufferMode"
+                                          Style="{StaticResource GisCheckBox}"
+                                          Content="開啟緩衝區量測"
+                                          Checked="chkBufferMode_Changed"
+                                          Unchecked="chkBufferMode_Changed"
+                                          Margin="0,0,0,8"/>
+                                <!-- 半徑輸入 -->
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="半徑"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+                                    <Border BorderBrush="{StaticResource BorderSubtle}"
+                                            BorderThickness="1"
+                                            CornerRadius="5"
+                                            Background="{StaticResource BgBase}"
+                                            Width="70">
+                                        <TextBox x:Name="txtBufferRadius"
+                                                 Text="500"
+                                                 FontSize="12"
+                                                 Foreground="{StaticResource TextPrimary}"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Padding="6,4"
+                                                 CaretBrush="{StaticResource AccentBlue}"/>
+                                    </Border>
+                                    <TextBlock Text="公尺"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               VerticalAlignment="Center"
+                                               Margin="8,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- ◆ 圖資來源說明 ◆ -->
+                        <TextBlock Text="外 部 圖 資" Style="{StaticResource SectionLabel}"
+                                   Margin="0,16,0,8"/>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <!-- NCDR -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <Ellipse Style="{StaticResource StatusDot}"
+                                             Fill="{StaticResource AccentGreen}"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,8,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="NCDR 潛勢圖資"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource TextSecondary}"/>
+                                        <TextBlock Text="國家災害防救科技中心"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <!-- WRA -->
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Style="{StaticResource StatusDot}"
+                                             Fill="{StaticResource AccentYellow}"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,8,0"/>
+                                    <StackPanel>
+                                        <TextBlock Text="水利署 GIS 圖台"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource TextSecondary}"/>
+                                        <TextBlock Text="經濟部水利署"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ── 底部狀態列 ── -->
+                <Border Grid.Row="2"
+                        Padding="14,10"
+                        BorderBrush="{StaticResource BorderSubtle}"
+                        BorderThickness="0,1,0,0">
+                    <StackPanel>
+                        <!-- 量測結果顯示 -->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="量測結果："
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextMuted}"/>
+                            <TextBlock x:Name="lblMeasureResult"
+                                       Text="—"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource AccentBlue}"/>
+                        </StackPanel>
+                        <!-- 座標顯示 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <TextBlock Text="座標："
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextMuted}"/>
+                            <TextBlock x:Name="lblCoordinates"
+                                       Text="—"
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextSecondary}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+        </Border>
+
+        <!-- ────────────────────────────────────────
+             右側地圖區
+        ──────────────────────────────────────── -->
+        <Grid Grid.Column="1">
+
+            <!-- 頂部狀態列 -->
+            <Border VerticalAlignment="Top"
+                    Background="#CC0D1117"
+                    BorderBrush="{StaticResource BorderSubtle}"
+                    BorderThickness="0,0,0,1"
+                    Padding="16,8"
+                    Panel.ZIndex="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- 左側：地圖標題 -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="地圖視圖"
+                                   FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   Margin="0,0,12,0"/>
+                        <Border Background="#162032"
+                                CornerRadius="4"
+                                Padding="6,2">
+                            <TextBlock Text="WikiMapia"
+                                       FontSize="10"
+                                       Foreground="{StaticResource AccentBlue}"/>
+                        </Border>
+                    </StackPanel>
+                    <!-- 右側：操作提示 -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="lblMapHint"
+                                   Text="左鍵拖曳平移 · 滾輪縮放"
+                                   FontSize="10"
+                                   Foreground="{StaticResource TextMuted}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- GMap 地圖控件 (WindowsFormsHost) — gMapControl1 在 code-behind 建立並設為 Child -->
+            <wfh:WindowsFormsHost x:Name="mapHost"
+                                  Margin="0,37,0,0"/>
+
+            <!-- 右下角縮放提示角標 -->
+            <Border VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,12,12"
+                    Background="#CC161B22"
+                    BorderBrush="{StaticResource BorderSubtle}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="10,6"
+                    Panel.ZIndex="10">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Style="{StaticResource StatusDot}"
+                             Fill="{StaticResource AccentGreen}"
+                             Margin="0,0,6,0"/>
+                    <TextBlock Text="連線正常"
+                               FontSize="10"
+                               Foreground="{StaticResource TextSecondary}"/>
+                </StackPanel>
+            </Border>
+
+        </Grid>
+    </Grid>
+</Window>
