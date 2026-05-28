@@ -6,15 +6,18 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GisWinFormsNet8App;
+using GisWinFormsNet8App.Services;
 
 namespace GisWpfApp
 {
     public partial class MainWindow : Window
     {
-        // ── 抽離的 Service（與 WinForms 版完全相同，零改動）──
         private readonly MapDataService _dataService;
         private readonly DisasterOverlayManager _disasterManager;
         private readonly MapMeasurementService _measurementService;
+
+        private readonly IGeoCoordinateService _geoService;
+        private readonly GeoCoordinateOverlayManager _geoManager;
 
         // GMap WinForms 控件，透過 WindowsFormsHost 嵌入
         private readonly GMapControl gMapControl1;
@@ -36,12 +39,17 @@ namespace GisWpfApp
             _dataService        = new MapDataService();
             _disasterManager    = new DisasterOverlayManager(gMapControl1);
             _measurementService = new MapMeasurementService(gMapControl1);
+            _geoService         = new MockGeoCoordinateService();
+            _geoManager         = new GeoCoordinateOverlayManager(gMapControl1);
 
             // 綁定 GMap 滑鼠事件
             gMapControl1.MouseClick += GMapControl1_MouseClick;
 
             // 即時顯示游標座標
             gMapControl1.MouseMove += GMapControl1_MouseMove;
+
+            // 預載設施點位資料
+            _ = LoadGeoPointsAsync();
         }
 
         // ──────────────────────────────────────────────────────
@@ -141,6 +149,25 @@ namespace GisWpfApp
             _isDisasterShown         = false;
             btnToggleDisaster.Content  = "顯示災害觀測點";
             _disasterManager.ToggleVisibility(false);
+        }
+
+        // ──────────────────────────────────────────────────────
+        // 設施點位 CheckBox
+        // ──────────────────────────────────────────────────────
+        private async Task LoadGeoPointsAsync()
+        {
+            var data = await _geoService.GetCoordinatesAsync();
+            _geoManager.LoadPoints(data);
+        }
+
+        private void chkGeo_Changed(object sender, RoutedEventArgs e)
+        {
+            if (sender == chkGeoA)
+                _geoManager.SetPointVisibility(0, chkGeoA.IsChecked == true);
+            else if (sender == chkGeoB)
+                _geoManager.SetPointVisibility(1, chkGeoB.IsChecked == true);
+            else if (sender == chkGeoC)
+                _geoManager.SetPointVisibility(2, chkGeoC.IsChecked == true);
         }
 
         // ──────────────────────────────────────────────────────

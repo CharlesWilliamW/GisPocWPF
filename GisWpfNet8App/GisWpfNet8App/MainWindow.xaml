@@ -278,6 +278,27 @@
                                       Unchecked="btnToggleDisaster_Unchecked"
                                       Margin="0,0,0,6"/>
 
+                        <!-- 設施點位 個別勾選 -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,6">
+                            <StackPanel>
+                                <CheckBox x:Name="chkGeoA"
+                                          Style="{StaticResource GisCheckBox}"
+                                          Content="太陽能設施 A"
+                                          Checked="chkGeo_Changed"
+                                          Unchecked="chkGeo_Changed"/>
+                                <CheckBox x:Name="chkGeoB"
+                                          Style="{StaticResource GisCheckBox}"
+                                          Content="風能設施 B"
+                                          Checked="chkGeo_Changed"
+                                          Unchecked="chkGeo_Changed"/>
+                                <CheckBox x:Name="chkGeoC"
+                                          Style="{StaticResource GisCheckBox}"
+                                          Content="行政區 C"
+                                          Checked="chkGeo_Changed"
+                                          Unchecked="chkGeo_Changed"/>
+                            </StackPanel>
+                        </Border>
+
                         <!-- ◆ 距離量測 Section ◆ -->
                         <TextBlock Text="距 離 量 測" Style="{StaticResource SectionLabel}"
                                    Margin="0,16,0,8"/>
