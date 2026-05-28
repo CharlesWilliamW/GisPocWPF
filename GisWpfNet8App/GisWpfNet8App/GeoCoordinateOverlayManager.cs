@@ -32,7 +32,7 @@ namespace GisWinFormsNet8App
                 var marker = new GMarkerGoogle(new PointLatLng(lat, lon), GMarkerGoogleType.blue)
                 {
                     ToolTipText = $"{pt.Name}\n高程: {pt.BaseElevation} m",
-                    ToolTipMode = MarkerTooltipMode.Always
+                    ToolTipMode = MarkerTooltipMode.OnMouseOver
                 };
 
                 overlay.Markers.Add(marker);
